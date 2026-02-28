@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cortex | Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #0a0a0c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+
+        .auth-container {
+            background: #121216;
+            border: 1px solid #1f1f23;
+            padding: 2.5rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header i {
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+
+        .auth-header h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .auth-header p {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: #0a0a0c;
+            border: 1px solid #2a2a30;
+            padding: 0.8rem;
+            border-radius: 6px;
+            color: #fff;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .btn-auth {
+            width: 100%;
+            background: #00d4ff;
+            color: #000;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-auth:hover {
+            background: #00b8e6;
+            transform: translateY(-2px);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .auth-footer a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        .message {
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+            display: block;
+        }
+        .auth-hint {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <i class="fa-solid fa-lock"></i>
+            <h1>RANSOMWARE</h1>
+            <p>Secure Terminal Access</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="cyber_defender" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-auth">AUTHORIZE ACCESS</button>
+        </form>
+
+        <div class="auth-footer">
+            New personnel? <a href="/register">Initialize Profile</a>
+        </div>
+        <p class="auth-hint" id="authHint"></p>
+    </div>
+
+    <script>
+        (function() {
+            const form = document.getElementById('loginForm');
+            const msg = document.getElementById('message');
+            const btn = form.querySelector('button[type="submit"]');
+            const hint = document.getElementById('authHint');
+            if (hint && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                hint.textContent = 'Default: admin / admin123';
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                msg.className = 'message';
+                msg.style.display = 'none';
+
+                const username = (document.getElementById('username').value || '').trim();
+                const password = document.getElementById('password').value || '';
+
+                if (!username) {
+                    msg.textContent = 'Please enter a username.';
+                    msg.className = 'message error';
+                    msg.style.display = 'block';
+                    return;
+                }
+                if (!password) {
+                    msg.textContent = 'Please enter a password.';
+                    msg.className = 'message error';
+                    msg.style.display = 'block';
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.textContent = 'Signing in…';
+
+                try {
+                    const res = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password }),
+                        credentials: 'include',
+                        redirect: 'follow'
+                    });
+
+                    if (res.redirected && res.ok) {
+                        window.location.replace('/');
+                        return;
+                    }
+
+                    const text = await res.text();
+                    let result = {};
+                    try {
+                        result = JSON.parse(text);
+                    } catch (_) {
+                        result = { status: 'error', message: 'Invalid response from server.' };
+                    }
+
+                    if (res.status === 429) {
+                        result.message = result.message || 'Too many attempts. Please wait 15 minutes and try again.';
+                    }
+                    if (res.status === 401) {
+                        result.message = result.message || 'Invalid username or password.';
+                    }
+
+                    if (result.status === 'ok') {
+                        window.location.replace('/');
+                    } else {
+                        msg.textContent = result.message || 'Login failed. Try again.';
+                        msg.className = 'message error';
+                        msg.style.display = 'block';
+                    }
+                } catch (err) {
+                    msg.textContent = 'Connection error. Is the server running at ' + window.location.origin + '?';
+                    msg.className = 'message error';
+                    msg.style.display = 'block';
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'AUTHORIZE ACCESS';
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: cortex-backend
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./database:/app/database
+      - ./logs:/app/logs
+      - ./ml_model:/app/ml_model
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  agent:
+    build: .
+    container_name: cortex-agent
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_API_URL=http://backend:5001/api/ingest_features
+      - MONITOR_INTERVAL_SECONDS=5
+      - LOG_LEVEL=info
+    volumes:
+      - .:/app/monitored_dir
+    command: [ "node", "monitoring/agent.js" ]
+    restart: unless-stopped

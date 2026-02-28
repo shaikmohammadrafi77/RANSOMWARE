@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\Windows 10\\Downloads\\major project\\logs\\.0a6efc701715e9b36410e926c5534828954d9f41-audit.json",
+    "files": [
+        {
+            "date": 1772257235496,
+            "name": "C:\\Users\\Windows 10\\Downloads\\major project\\logs\\system-2026-02-28.log",
+            "hash": "3f953fcd88ad6826aee617fffe7aa5a3ed488a733891e9db4fe9be1e5257fd3f"
+        }
+    ],
+    "hashType": "sha256"
+}

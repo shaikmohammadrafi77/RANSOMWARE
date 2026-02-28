@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+    content="Cortex AI Ransomware Defense System — Real-time threat detection and active prevention platform for cybersecurity operations." />
+  <title>Cortex | Production Security Operations Center</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="static/styles.css">
+</head>
+
+<body>
+  <div class="app-layout">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="brand-text">
+          <h1>RANSOMWARE</h1>
+          <span>DEFENSE SYSTEM</span>
+        </div>
+      </div>
+
+      <div class="user-info-sidebar" id="sidebarUserInfo">
+        <div class="user-avatar" id="sidebarAvatar">--</div>
+        <div class="user-details">
+          <span class="user-name" id="sidebarUsername">Loading…</span>
+          <span class="user-role-badge" id="sidebarRoleBadge">--</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#" class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-view="incidents" id="nav-incidents">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>Incidents</span>
+          <span class="nav-badge" id="openIncidentsBadge">0</span>
+        </a>
+        <a href="#" class="nav-item" data-view="model" id="nav-model">
+          <i class="fa-solid fa-brain"></i>
+          <span>AI Model</span>
+        </a>
+        <a href="#" class="nav-item" data-view="reports" id="nav-reports">
+          <i class="fa-solid fa-file-chart-line"></i>
+          <span>Reports</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-system-status">
+        <div class="status-row">
+          <div class="status-dot online" id="sidebarServerDot"></div>
+          <span id="sidebarServerStatus">Server Online</span>
+        </div>
+        <div class="status-row">
+          <div class="status-dot online" id="sidebarDbDot"></div>
+          <span id="sidebarDbStatus">Database OK</span>
+        </div>
+        <div class="status-row">
+          <div class="status-dot" id="sidebarModelDot"></div>
+          <span id="sidebarModelStatus">Model Loading…</span>
+        </div>
+      </div>
+
+      <button class="btn-logout" id="logoutBtn">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </button>
+    </aside>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main class="main-content">
+
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="page-title">
+          <h2 id="pageTitle">Security Operations Center</h2>
+          <p id="pageSubtitle">Real-time threat detection and active prevention</p>
+        </div>
+        <div class="header-actions">
+          <div class="auto-refresh-indicator" id="autoRefreshIndicator">
+            <span class="pulse-dot"></span>
+            <span>Auto-refresh: <span id="refreshCountdown">5</span>s</span>
+          </div>
+          <button id="refreshBtn" class="btn btn-primary">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+          </button>
+        </div>
+      </header>
+
+      <!-- ══════════════════ VIEW: DASHBOARD ══════════════════ -->
+      <div id="view-dashboard" class="view-section">
+
+        <!-- KPI Row -->
+        <div class="kpi-grid">
+          <div class="kpi-card cpu-card">
+            <div class="kpi-icon"><i class="fa-solid fa-microchip"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">CPU Load</span>
+              <div class="kpi-value"><span id="cpuUsage">0</span>%</div>
+              <div class="kpi-bar">
+                <div id="cpuBar" class="kpi-bar-fill cpu-fill" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="kpi-card mem-card">
+            <div class="kpi-icon"><i class="fa-solid fa-memory"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Memory</span>
+              <div class="kpi-value"><span id="memoryUsage">0</span>%</div>
+              <div class="kpi-bar">
+                <div id="memoryBar" class="kpi-bar-fill mem-fill" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="kpi-card threat-card">
+            <div class="kpi-icon"><i class="fa-solid fa-virus"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Threats Detected</span>
+              <div class="kpi-value text-red" id="ransomwareIncidents">0</div>
+              <div class="kpi-sub">Total events: <span id="totalIncidents">0</span></div>
+            </div>
+          </div>
+          <div class="kpi-card block-card">
+            <div class="kpi-icon success"><i class="fa-solid fa-shield-check"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Prevention Rate</span>
+              <div class="kpi-value text-green" id="preventionRate">0%</div>
+              <div class="kpi-sub">Threats blocked: <span id="blockedCount">0</span></div>
+            </div>
+          </div>
+          <div class="kpi-card model-kpi-card">
+            <div class="kpi-icon"><i class="fa-solid fa-robot"></i></div>
+            <div class="kpi-body">
+              <span class="kpi-label">Model Accuracy</span>
+              <div class="kpi-value text-cyan" id="modelAccuracy">--</div>
+              <div class="kpi-sub" id="modelVersionBadge">v--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-grid">
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-wave-square"></i> CPU Trend</h3>
+              <span class="chart-subtitle">Last 30 readings</span>
+            </div>
+            <canvas id="cpuChart" height="120"></canvas>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-area"></i> Threat Activity</h3>
+              <span class="chart-subtitle">Detection trend (14 days)</span>
+            </div>
+            <canvas id="threatChart" height="120"></canvas>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-pie"></i> Severity Distribution</h3>
+              <span class="chart-subtitle">All incidents</span>
+            </div>
+            <canvas id="severityChart" height="120"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent Incidents Table -->
+        <div class="card table-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-list-timeline"></i> Recent Activity</h3>
+            <div class="live-indicator">
+              <span class="pulse"></span> Live
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Host</th>
+                  <th>Assessment</th>
+                  <th>Confidence</th>
+                  <th>Severity</th>
+                  <th>Prevention</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardTableBody">
+                <tr>
+                  <td colspan="6" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════ VIEW: INCIDENTS ══════════════════ -->
+      <div id="view-incidents" class="view-section" style="display:none">
+
+        <!-- Filters -->
+        <div class="card filter-bar">
+          <div class="filter-group">
+            <label for="filterSeverity"><i class="fa-solid fa-filter"></i> Severity</label>
+            <select id="filterSeverity" class="form-control">
+              <option value="">All Severities</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterStatus"><i class="fa-solid fa-circle-dot"></i> Status</label>
+            <select id="filterStatus" class="form-control">
+              <option value="">All Statuses</option>
+              <option value="OPEN">Open</option>
+              <option value="INVESTIGATING">Investigating</option>
+              <option value="RESOLVED">Resolved</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterLabel"><i class="fa-solid fa-tag"></i> Label</label>
+            <select id="filterLabel" class="form-control">
+              <option value="">All Labels</option>
+              <option value="ransomware">Ransomware</option>
+              <option value="normal">Normal</option>
+            </select>
+          </div>
+          <div class="filter-actions">
+            <button class="btn btn-primary" id="applyFiltersBtn">
+              <i class="fa-solid fa-search"></i> Apply
+            </button>
+            <button class="btn btn-ghost" id="clearFiltersBtn">
+              <i class="fa-solid fa-xmark"></i> Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="card table-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-shield-exclamation"></i> Incident Registry</h3>
+            <span class="incident-count-label" id="incidentCountLabel">0 records</span>
+          </div>
+          <div class="table-responsive">
+            <table id="incidentsTable">
+              <thead>
+                <tr>
+                  <th>Incident ID</th>
+                  <th>Timestamp</th>
+                  <th>Host</th>
+                  <th>Label</th>
+                  <th>Severity</th>
+                  <th>Status</th>
+                  <th>Prevention</th>
+                  <th>Resolution</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="fullIncidentTableBody">
+                <tr>
+                  <td colspan="9" class="empty-state">Loading…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════ VIEW: AI MODEL ══════════════════ -->
+      <div id="view-model" class="view-section" style="display:none">
+        <div class="model-grid">
+
+          <!-- Model Status Card -->
+          <div class="card model-status-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-network-wired"></i> Active Model</h3>
+              <span class="badge badge-success" id="modelStatusBadge">Loaded</span>
+            </div>
+            <div class="model-detail-list">
+              <div class="model-detail-item">
+                <span class="detail-label">Architecture</span>
+                <span class="detail-value">MLP (64→32→16→1)</span>
+              </div>
+              <div class="model-detail-item">
+                <span class="detail-label">Framework</span>
+                <span class="detail-value">TensorFlow.js</span>
+              </div>
+              <div class="model-detail-item">
+                <span class="detail-label">Version</span>
+                <span class="detail-value" id="activeModelVersion">--</span>
+              </div>
+              <div class="model-detail-item">
+                <span class="detail-label">Input Features</span>
+                <span class="detail-value">12 Behavioral Signals</span>
+              </div>
+              <div class="model-detail-item">
+                <span class="detail-label">Detection Threshold</span>
+                <span class="detail-value">0.70</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Performance Metrics -->
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-radar"></i> Performance Metrics</h3>
+            </div>
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <div class="metric-ring accuracy">
+                  <span id="metricAccuracy">--</span>
+                </div>
+                <span class="metric-label">Accuracy</span>
+              </div>
+              <div class="metric-box">
+                <div class="metric-ring precision">
+                  <span id="metricPrecision">--</span>
+                </div>
+                <span class="metric-label">Precision</span>
+              </div>
+              <div class="metric-box">
+                <div class="metric-ring recall">
+                  <span id="metricRecall">--</span>
+                </div>
+                <span class="metric-label">Recall</span>
+              </div>
+              <div class="metric-box">
+                <div class="metric-ring f1">
+                  <span id="metricF1">--</span>
+                </div>
+                <span class="metric-label">F1 Score</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature Importance -->
+          <div class="card feature-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-list-check"></i> Behavioral Features</h3>
+            </div>
+            <div class="feature-list">
+              <div class="feature-item">
+                <span>File Modification Rate</span>
+                <div class="feature-bar">
+                  <div style="width:95%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Entropy Rate</span>
+                <div class="feature-bar">
+                  <div style="width:90%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Suspicious Extension Ratio</span>
+                <div class="feature-bar">
+                  <div style="width:88%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>CPU Usage</span>
+                <div class="feature-bar">
+                  <div style="width:75%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Files Touched</span>
+                <div class="feature-bar">
+                  <div style="width:72%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Registry Modifications</span>
+                <div class="feature-bar">
+                  <div style="width:65%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Failed File Accesses</span>
+                <div class="feature-bar">
+                  <div style="width:60%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Network Bytes Sent</span>
+                <div class="feature-bar">
+                  <div style="width:55%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>API Call Count</span>
+                <div class="feature-bar">
+                  <div style="width:50%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Memory Usage</span>
+                <div class="feature-bar">
+                  <div style="width:48%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Network Bytes Recv</span>
+                <div class="feature-bar">
+                  <div style="width:42%"></div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <span>Avg File Size (KB)</span>
+                <div class="feature-bar">
+                  <div style="width:35%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Model Versions History -->
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-code-branch"></i> Version History</h3>
+            </div>
+            <div id="modelVersionsList" class="version-list">
+              <div class="empty-state">Loading versions…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════ VIEW: REPORTS ══════════════════ -->
+      <div id="view-reports" class="view-section" style="display:none">
+        <div class="reports-grid">
+
+          <!-- System Summary -->
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-file-shield"></i> System Summary Report</h3>
+              <button class="btn btn-ghost btn-sm" id="refreshSummaryBtn">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+            </div>
+            <div id="systemSummaryContent" class="summary-content">
+              <div class="empty-state">Click refresh to generate…</div>
+            </div>
+          </div>
+
+          <!-- Export -->
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-file-export"></i> Data Export</h3>
+            </div>
+            <div class="export-actions">
+              <div class="export-item">
+                <div class="export-icon"><i class="fa-solid fa-file-csv"></i></div>
+                <div class="export-info">
+                  <strong>Incident Log CSV</strong>
+                  <p>Full incident history with all metadata</p>
+                </div>
+                <button class="btn btn-primary" id="exportCsvBtn">
+                  <i class="fa-solid fa-download"></i> Download
+                </button>
+              </div>
+              <div class="export-item">
+                <div class="export-icon"><i class="fa-solid fa-file-lines"></i></div>
+                <div class="export-info">
+                  <strong>Security Report</strong>
+                  <p>JSON summary for integration with SIEM</p>
+                </div>
+                <button class="btn btn-primary" id="exportJsonBtn">
+                  <i class="fa-solid fa-download"></i> Export
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ══════════ INCIDENT MANAGE MODAL ══════════ -->
+  <div id="incidentModal" class="modal-overlay" style="display:none">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-pen-to-square"></i> Manage Incident</h3>
+          <span class="modal-incident-id" id="modalIncidentId"></span>
+        </div>
+        <button id="closeModalBtn" class="btn-icon"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-two-col">
+          <div class="form-group">
+            <label>Severity Level</label>
+            <select id="modalSeverity" class="form-control">
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+              <option value="CRITICAL">Critical</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="modalStatus" class="form-control">
+              <option value="OPEN">Open</option>
+              <option value="INVESTIGATING">Investigating</option>
+              <option value="RESOLVED">Resolved</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Analyst Comments</label>
+          <textarea id="modalComments" class="form-control" rows="4"
+            placeholder="Add investigation notes, findings or resolution steps…"></textarea>
+        </div>
+        <div class="incident-timeline" id="incidentTimeline"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelModalBtn" class="btn btn-ghost">Cancel</button>
+        <button id="saveIncidentBtn" class="btn btn-primary">
+          <i class="fa-solid fa-floppy-disk"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast" style="display:none"></div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="static/app.js"></script>
+</body>
+
+</html>

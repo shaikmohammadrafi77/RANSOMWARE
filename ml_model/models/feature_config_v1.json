@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "numeric_features": [
+    "file_modification_rate",
+    "entropy_rate",
+    "avg_file_size_kb",
+    "num_files_touched",
+    "cpu_usage",
+    "memory_usage",
+    "num_api_calls",
+    "network_bytes_sent",
+    "network_bytes_recv",
+    "suspicious_extension_ratio",
+    "registry_modifications",
+    "failed_file_accesses"
+  ],
+  "scaler": {
+    "mean": [
+      101.46582794189453,
+      5.24713134765625,
+      402.7059020996094,
+      59.75749969482422,
+      52.5984001159668,
+      52.19191360473633,
+      74.97474670410156,
+      297549.0625,
+      189555.140625,
+      0.3297380805015564,
+      13.427499771118164,
+      10.47700023651123
+    ],
+    "std": [
+      102.7256851196289,
+      2.379046678543091,
+      162.9781951904297,
+      40.61307144165039,
+      33.64208221435547,
+      24.076904296875,
+      26.3958740234375,
+      243889.390625,
+      153305.4375,
+      0.32623106241226196,
+      12.02496337890625,
+      10.03426456451416
+    ]
+  },
+  "metrics": {
+    "accuracy": 1,
+    "loss": 0.00841370690613985,
+    "precision": null,
+    "recall": null,
+    "f1_score": null,
+    "threshold": 0.7
+  },
+  "trained_at": "2026-02-28T03:02:55.182Z",
+  "architecture": "MLP-64-32-16-1",
+  "framework": "TensorFlow.js"
+}

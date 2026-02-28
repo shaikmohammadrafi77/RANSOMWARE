@@ -1,0 +1,42 @@
+{
+  "name": "cortex-ransomware-defense",
+  "version": "2.0.0",
+  "description": "Cortex — AI-Driven Ransomware Detection & Active Prevention System (Production Academic Platform)",
+  "main": "backend/server.js",
+  "scripts": {
+    "dev": "nodemon backend/server.js",
+    "start": "node backend/server.js",
+    "train": "node ml_model/train_model.js",
+    "evaluate": "node ml_model/evaluate_model.js",
+    "agent": "node monitoring/agent.js",
+    "clean": "node -e \"const fs=require('fs');['database/ransomware_monitor_js.db','ml_model/model','logs'].forEach(p=>{try{fs.rmSync(p,{recursive:true,force:true})}catch(_){}}); console.log('Cleaned')\""
+  },
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.20.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "node-fetch": "^3.3.2",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "systeminformation": "^5.23.10",
+    "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "chokidar": "^3.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
