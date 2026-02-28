@@ -1111,6 +1111,24 @@ async function recordMetrics() {
 }
 
 // ─── Startup ──────────────────────────────────────────────────────────────────
+function openBrowserOnce(port) {
+  // Best-effort: only auto-open in non-production and when running on a desktop.
+  if (process.env.NODE_ENV === "production") return;
+  const url = `http://localhost:${port}`;
+  try {
+    if (process.platform === "win32") {
+      // On Windows, use the default browser via "start".
+      exec(`start "" "${url}"`);
+    } else if (process.platform === "darwin") {
+      exec(`open "${url}"`);
+    } else {
+      exec(`xdg-open "${url}"`);
+    }
+  } catch {
+    // Ignore failures — server log already shows the URL.
+  }
+}
+
 async function start() {
   try {
     await initDb();
@@ -1131,6 +1149,7 @@ async function start() {
         `[SERVER] Cortex Defense System running → http://localhost:${PORT}`
       );
       logger.info(`[SERVER] ML Model: v${modelVersion} | Threshold: ${DETECTION_THRESHOLD}`);
+      openBrowserOnce(PORT);
     });
   } catch (err) {
     logger.error("[STARTUP] Fatal error:", { error: err.message, stack: err.stack });

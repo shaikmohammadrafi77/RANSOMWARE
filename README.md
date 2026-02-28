@@ -87,6 +87,16 @@ npm start
 
 (In development, the admin password is synced to `admin123` on every server start.)
 
+### Stopping the server on Windows
+
+If a Node server is stuck or the port is already in use, you can forcibly stop all Node processes from PowerShell:
+
+```powershell
+taskkill /IM node.exe /F
+```
+
+Use this only when you know you do not need any other Node apps that are running.
+
 ### Optional: train the ML model
 
 If `ml_model/model` is missing, run:
